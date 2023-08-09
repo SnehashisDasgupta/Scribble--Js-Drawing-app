@@ -17,7 +17,8 @@
     <div id="content">
         <h1>Data Creator</h1>
         <div>
-            <input id="student" type="text" placeholder="Brushstroke your identity">
+            <input id="student" type="text" placeholder="Brushstroke your identity🖊">
+            <span id="instructions"></span>
             <button id="advanceBtn" onclick="start();">
                 START
             </button>
@@ -31,13 +32,77 @@
 
     <!-- create a new instance of a 'SketchPad' object -->
     <script>
+        let index = 0;
+        const labels = ["car", "fish", "house", "tree", "bicycle", "guitar", "pencil", "clock"];
         const data = {
             student: null,
             session: new Date().getTime(),
             drawings: {}
         };
-        
+
         const sketchPad = new SketchPad(sketchPadContainer);
+
+        function start(){
+            if (student.value == ""){
+                alert("Brushstroke your identity first🖊");
+                return;
+            }
+            data.student = student.value;
+            student.style.display = "none";
+            sketchPadContainer.style.visibility = "visible";
+
+            const label = labels[index];
+            instructions.innerHTML = "Sketch a " + label;
+            advanceBtn.innerHTML = "NEXT";
+            advanceBtn.onclick = next;
+        }
+
+        function next(){
+            // If no paths are present, it displays an alert informing the user to sketch something before proceeding, and then returns to exit the function
+            if(sketchPad.paths.length == 0){
+                alert("Sketch something first!🎨");
+                return;
+            }
+            const label = labels[index];
+            data.drawings[label] = sketchPad.paths;
+            sketchPad.reset();
+
+            index++;
+            if(index < labels.length){
+                const nextLabel = labels[index];
+                instructions.innerHTML = "Sketch a " + nextLabel;
+            }else{
+                sketchPadContainer.style.visibility = "hidden";
+                instructions.innerHTML = "Excellent drawings";
+                advanceBtn.innerHTML = "SAVE";
+                advanceBtn.onclick = save;
+            }
+        }
+
+        //The 'save()' function you've provided seems to be used to save the 'data' object as a JSON file for downloading.
+        function save(){
+            advanceBtn.style.display = 'none';
+            instructions.innerHTML = "Take your downloaded file";
+
+            //This creates a new <a> (anchor) element in the DOM
+            const element = document.createElement('a');
+                //sets the 'href' attribute of the anchor element to a data URI containing the JSON data from the 'data' object
+                element.setAttribute('href',
+                'data: text/plain; charset= utf-8' + 
+                encodeURIComponent(JSON.stringify(data))
+            );
+
+            //Additional attributes and styling for the download link
+            // generates a filename for the downloaded file using the 'session' property of the 'data' object and appends the '.json' file extension
+            const fileName = data.session + ".json";
+            element.setAttribute('download', fileName);
+
+            //Appending and triggering the download link
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
     </script>
 </body>
 </html>
