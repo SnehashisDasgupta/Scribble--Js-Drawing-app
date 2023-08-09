@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- width of the viewport should be set to the width of the device's screen -->
+    <meta name="viewport" content="
+        width=device-width, 
+        maximum-scale=0.9,
+        user-scalable=0" 
+    >
+    <!-- support any character, emojis, special symbol in 'Name' input -->
+    <meta charset="UTF-8">  
     <title>Data Creator</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -8,8 +16,14 @@
 <body>
     <div id="content">
         <h1>Data Creator</h1>
+        <div>
+            <input id="student" type="text" placeholder="Brushstroke your identity">
+            <button id="advanceBtn" onclick="start();">
+                START
+            </button>
+        </div>
         <br>
-        <div id="sketchPadContainer"></div>
+        <div id="sketchPadContainer" style="visibility: hidden;"></div>
     </div>
 
     <script src="js/draw.js"></script>
@@ -17,6 +31,12 @@
 
     <!-- create a new instance of a 'SketchPad' object -->
     <script>
+        const data = {
+            student: null,
+            session: new Date().getTime(),
+            drawings: {}
+        };
+        
         const sketchPad = new SketchPad(sketchPadContainer);
     </script>
 </body>

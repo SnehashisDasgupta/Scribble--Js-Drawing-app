@@ -9,18 +9,27 @@ class SketchPad{
         `;
         container.appendChild(this.canvas);
 
+        const lineBreak = document.createElement("br");
+        container.appendChild(lineBreak);
+
+        this.undoBtn = document.createElement("button");
+        this.undoBtn.innerHTML = "UNDO";
+        container.appendChild(this.undoBtn);
+
         //'getContext("2d")' returns obj that provide methods for drawing on the canvas in a 2D context
         // 'this.ctx' is used to store the 2D drawing context
         this.ctx = this.canvas.getContext("2d");
 
         this.paths = [];
         this.isDrawing = false;
+        this.#redraw(); //disable the 'UNDO' button when refreshed
 
         this.#addEventListeners();
     }
 
     #addEventListeners(){
 
+        // FOR PC
         // method will run when left click button is pressed on mouse.['mousedown' event]
         this.canvas.onmousedown= (evt) =>{
             const mouse = this.#getMouse(evt);
@@ -45,6 +54,29 @@ class SketchPad{
         this.canvas.onmouseup= () =>{
             this.isDrawing = false;
         }
+
+        // FOR SMARTPHONE
+        //'ontouchstart' functionality work on touch devices like smartphones
+        this.canvas.ontouchstart= (evt) =>{
+            const loc = evt.touches[0];
+            this.canvas.onmousedown(loc);
+        }
+
+        this.canvas.ontouchmove= (evt) => {
+            const loc = evt.touches[0];
+            this.canvas.onmousemove(loc);
+        }
+
+        this.canvas.ontouchend= () =>{
+            this.canvas.onmouseup();
+        }
+
+
+        // UNDO function
+        this.undoBtn.onclick= () =>{
+            this.paths.pop();
+            this.#redraw();
+        }
     }
 
     #redraw(){
@@ -52,6 +84,12 @@ class SketchPad{
         this.ctx.clearRect(0,0,
             this.canvas.width, this.canvas.height);
         draw.paths(this.ctx, this.paths);
+        // if canvas is clean, then disable 'UNDO' button
+        if(this.paths.length > 0){
+            this.undoBtn.disabled = false;
+        }else{
+            this.undoBtn.disabled = true;
+        }
     }
 
     #getMouse= (evt) => {
